@@ -20,13 +20,13 @@ export async function register({email , contact , password , fullname , isSeller
 
 
 export async function login({ email , password}) {
-    const reposne = await authApiInstance.post("/login" , {
+    const response = await authApiInstance.post("/login" , {
         email , password
     })
-    return respone.data
+    return response.data
 }
 
 export async function getMe(){
-    const reposne = await authApiInstance.get("/me")
-    return respone.data
+    const response = await authApiInstance.get("/me")
+    return response.data
 }
