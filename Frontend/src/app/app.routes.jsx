@@ -4,6 +4,7 @@ import Login from "../features/auth/pages/Login";
 import CreateProduct from "../features/products/pages/CreateProduct";
 import Dashboard from "../features/products/pages/Dashboard";
 import Protected from "../features/auth/components/Protected";
+import Home from "../features/products/pages/Home";
 import AppLayout from "./Applayout";
 
 export const routes = createBrowserRouter([
@@ -20,7 +21,7 @@ export const routes = createBrowserRouter([
     children: [
         {
             path: "/",
-            element: <div>Home Page</div>
+            element: <Home/>
         } ,
         {
             path: "/seller" ,
