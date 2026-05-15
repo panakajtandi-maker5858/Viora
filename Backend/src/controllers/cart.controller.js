@@ -155,3 +155,78 @@ export const incrementCartItemQuantity = async (req, res) => {
         success: true
     })
 }
+
+
+
+export const decrementCartItemQuantity = async (req, res) => {
+    const { productId, variantId } = req.params
+
+    const cart = await cartModel.findOne({ user: req.user._id })
+
+    if (!cart) {
+        return res.status(404).json({
+            message: "Cart not found",
+            success: false
+        })
+    }
+
+    const item = cart.items.find(
+        item => item.product.toString() === productId &&
+        item.variant?.toString() === variantId
+    )
+
+    if (!item) {
+        return res.status(404).json({
+            message: "Item not found in cart",
+            success: false
+        })
+    }
+
+    // Agar quantity 1 hai toh item remove kar do
+    if (item.quantity <= 1) {
+        cart.items = cart.items.filter(
+            item => !(item.product.toString() === productId &&
+                item.variant?.toString() === variantId)
+        )
+    } else {
+        // Quantity decrement karo
+        await cartModel.findOneAndUpdate(
+            { user: req.user._id, "items.product": productId, "items.variant": variantId },
+            { $inc: { "items.$.quantity": -1 } },
+            { new: true }
+        )
+    }
+
+    await cart.save()
+
+    return res.status(200).json({
+        message: "Cart item quantity decremented successfully",
+        success: true
+    })
+}
+
+
+export const removeCartItem = async (req, res) => {
+    const { productId, variantId } = req.params
+
+    const cart = await cartModel.findOne({ user: req.user._id })
+
+    if (!cart) {
+        return res.status(404).json({
+            message: "Cart not found",
+            success: false
+        })
+    }
+
+    cart.items = cart.items.filter(
+        item => !(item.product.toString() === productId &&
+            item.variant?.toString() === variantId)
+    )
+
+    await cart.save()
+
+    return res.status(200).json({
+        message: "Item removed from cart successfully",
+        success: true
+    })
+}

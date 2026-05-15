@@ -10,7 +10,7 @@ const ProductDetail = () => {
     const [selectedAttributes, setSelectedAttributes] = useState({});
     const navigate = useNavigate();
     const { handleGetProductById } = useProduct();
-    const { handleAddItem } = useCart()
+    const { handleAddItem , handleGetCart } = useCart()
 
     async function fetchProductDetails() {
         try {
@@ -241,12 +241,33 @@ const ProductDetail = () => {
                                         e.currentTarget.style.backgroundColor = '#1b1c1a';
                                         e.currentTarget.style.color = '#fbf9f6';
                                     }}
-                                    onClick={() => {
-                                        handleAddItem({
-                                            productId: product._id,
-                                            variantId: activeVariant._id
-                                        })
-                                    }}
+                                    onClick={async () => {
+    try {
+        // Agar variant select nahi hai toh first variant use karo
+        const variantToUse = activeVariant || product?.variants?.[0]
+        
+        if (!variantToUse) {
+            alert("Please add at least one variant to this product")
+            return
+        }
+        
+        await handleAddItem({
+            productId: product._id,
+            variantId: variantToUse._id
+        })
+        
+        alert("Added to cart successfully!")
+        handleGetCart() // Cart refresh karo
+        
+    } catch (error) {
+        // Stock full ya koi error
+        if (error.response?.data?.message) {
+            alert(error.response.data.message)
+        } else {
+            alert("Failed to add to cart")
+        }
+    }
+}}
                                 >
                                     Add to Cart
                                 </button>
