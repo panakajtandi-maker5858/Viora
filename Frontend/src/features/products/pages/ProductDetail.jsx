@@ -120,20 +120,32 @@ const ProductDetail = () => {
                         <div className="w-full lg:w-[70%] flex flex-col-reverse md:flex-row gap-4 lg:gap-6">
 
                             {/* Thumbnails */}
-                            {displayImages.length > 1 && (
-                                <div className="flex flex-row md:flex-col gap-4 overflow-x-auto md:overflow-y-auto pb-2 md:pb-0 w-full md:w-20 lg:w-24 flex-shrink-0">
-                                    {displayImages.map((img, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setSelectedImage(idx)}
-                                            className={`flex-shrink-0 w-20 md:w-full aspect-[4/5] overflow-hidden transition-all duration-300 ${selectedImage === idx ? 'opacity-100 ring-1 ring-[#C9A96E] ring-offset-2' : 'opacity-50 hover:opacity-100'}`}
-                                            style={{ backgroundColor: '#f5f3f0' }}
-                                        >
-                                            <img src={img.url} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Variant Thumbnails - Each variant gets ONE thumbnail */}
+{product?.variants?.length > 1 && (
+    <div className="flex flex-row md:flex-col gap-4 overflow-x-auto md:overflow-y-auto pb-2 md:pb-0 w-full md:w-20 lg:w-24 flex-shrink-0">
+        {product.variants.map((variant, idx) => {
+            const variantImage = variant.images?.[0]?.url || product.images?.[0]?.url
+            const isActiveVariant = activeVariant?._id === variant._id
+            
+            return (
+                <button
+                    key={variant._id}
+                    onClick={() => {
+                        // Variant ke attributes set karo
+                        if (variant.attributes) {
+                            setSelectedAttributes(variant.attributes)
+                        }
+                        setSelectedImage(0) // Main image ko first pe reset karo
+                    }}
+                    className={`flex-shrink-0 w-20 md:w-full aspect-[4/5] overflow-hidden transition-all duration-300 ${isActiveVariant ? 'opacity-100 ring-2 ring-[#C9A96E] ring-offset-2' : 'opacity-50 hover:opacity-100'}`}
+                    style={{ backgroundColor: '#f5f3f0' }}
+                >
+                    <img src={variantImage} alt={`Variant ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+            )
+        })}
+    </div>
+)}
 
                             {/* Main Image */}
                             <div className="relative w-full aspect-[4/5] overflow-hidden group" style={{ backgroundColor: '#f5f3f0' }}>
