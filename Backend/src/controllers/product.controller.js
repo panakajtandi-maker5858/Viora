@@ -42,7 +42,7 @@ export async function getSellerProducts(req, res){
    })
 
 
-   req.status(200).json({
+   res.status(200).json({
     message : "Product fetched successfully" ,
     success : true ,
     products 
@@ -65,7 +65,7 @@ return res.status(200).json({
 export async function getProductDetails(req, res) {
     const { id } = req.params ;
 
-    const product = await productModel.findOne(id)
+    const product = await productModel.findById(id)
 
     if(!product){
         return res.status(404).json({
@@ -82,59 +82,58 @@ export async function getProductDetails(req, res) {
     
 }
 
-export async function addProductVariant(req, res){
+export async function addProductVariant(req, res) {
 
-const productId = req.params.productId ;
+    const productId = req.params.productId;
 
-const product = await productModel.findOne({
-    _id : productId ,
-    seller : req.user._id 
-})
+    const product = await productModel.findOne({
+        _id: productId,
+        seller: req.user._id
+    });
 
-if(!product){
-    return res.status(404).json({
-        message: "Product not found",
-        success : false
-    })
-}
-
-const files = req.files 
-const images = []
-if(files || files.length !== 0){
-    (await Promise.all(files.map(async (files)=>{
-        const image = await uploadFile({
-            buffer : file.buffer ,
-            fileName: file.originalname
+    if (!product) {
+        return res.status(404).json({
+            message: "Product not found",
+            success: false
         })
-        return image
-    }))).map(image => images.push(image))
-}
+    }
 
-const price = req.body.priceAmount 
-const stock = req.body.stock 
-const attributes = JSON.parse(req.body.atttributes || "{}")
+    const files = req.files;
+    const images = [];
+    
+    if (files && files.length !== 0) {
+        const uploadedImages = await Promise.all(
+            files.map(async (file) => {
+                return await uploadFile({
+                    buffer: file.buffer,
+                    fileName: file.originalname
+                })
+            })
+        )
+        images.push(...uploadedImages)
+    }
 
-console.log(price)
+    const price = req.body.priceAmount
+    const stock = req.body.stock
+    const attributes = JSON.parse(req.body.attributes || "{}")
 
-product.variants.push({
-    images ,
-    price : {
-        amount: Number(price) || product.price.amount ,
-        currency : req.body.priceCurrency || product.price.currency
-    } ,
-    stock ,
-    attributes
-})
+    product.variants.push({
+        images,
+        price: {
+            amount: Number(price) || product.price.amount,
+            currency: req.body.priceCurrency || product.price.currency
+        },
+        stock,
+        attributes
+    })
 
-await product.save()
+    await product.save();
 
-return res.status(200).json({
-    message: "Product varient added succesfully",
-    success: true ,
-    product
-})
-
-
+    return res.status(200).json({
+        message: "Product variant added successfully",
+        success: true,
+        product
+    })
 }
 
 

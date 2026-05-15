@@ -40,7 +40,7 @@ async function handleAddProductVariant(productId, newProductVariant) {
 
 
 
-return { handleCreateProduct , handleGetSellerProduct , handleGetAllProducts, handleGetAllProducts , handleAddProductVariant}
+return { handleCreateProduct , handleGetSellerProduct , handleGetAllProducts, handleGetProductById , handleAddProductVariant}
 
 
 }
