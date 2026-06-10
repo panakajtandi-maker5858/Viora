@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { useAuth } from "../hook/useAuth";
 import { useNavigate } from "react-router";
 import ContinueWithGoogle from '../components/ContinueWithGoogle';
+import Toast from '../components/Toast'
+
 
 const Login = () => {
     const { handleLogin } = useAuth();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [toast, setToast] = useState(null) 
+
 
     const [formData, setFormData] = useState({
         email: '',
@@ -19,21 +23,56 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const user = await handleLogin({ email: formData.email, password: formData.password });
-            if (user.role == "buyer") {
-                navigate("/");
-            } else if (user.role == "seller") {
-                navigate("/seller/dashboard");
+    e.preventDefault();
+
+    // Frontend validation
+    if (!formData.email || !formData.password) {
+        setToast({ message: 'Please fill in all fields', type: 'error' })
+        return
+    }
+
+    if (!formData.email.includes('@')) {
+        setToast({ message: 'Please enter a valid email address', type: 'error' })
+        return
+    }
+
+    if (formData.password.length < 6) {
+        setToast({ message: 'Password must be at least 6 characters', type: 'error' })
+        return
+    }
+
+    try {
+        const user = await handleLogin({ 
+            email: formData.email, 
+            password: formData.password 
+        })
+        setToast({ message: 'Logged in successfully!', type: 'success' })
+        setTimeout(() => {
+            if (user?.role === 'seller') {
+                navigate('/seller/dashboard')
+            } else {
+                navigate('/')
             }
-        } catch (error) {
-            console.error("Login failed", error);
-        }
-    };
+        }, 1000)
+    } catch (error) {
+        const message = error?.response?.data?.message
+            || error?.response?.data?.errors?.[0]?.msg
+            || 'Login failed. Please try again.'
+        setToast({ message, type: 'error' })
+    }
+}
 
     return (
         <>
+
+          {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(null)}
+            />
+        )}
+
             <link
                 href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
                 rel="stylesheet"

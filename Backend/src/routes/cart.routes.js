@@ -31,9 +31,20 @@ router.get('/' , authenticateUser , getCart)
 router.patch("/quantity/increment/:productId/:variantId", authenticateUser, validateIncrementCartItemQuantity, incrementCartItemQuantity)
 
 
+/**
+ * @route PATCH /api/cart/quantity/decrement/:productId/:variantId
+ * @desc Decrement item quantity in cart by one
+ * @access Private
+ */
 router.patch("/quantity/decrement/:productId/:variantId", authenticateUser, validateIncrementCartItemQuantity, decrementCartItemQuantity)
 
 
+
+/**
+ * @route PATCH /api/cart/remove/"productId/:variantId 
+ * @desc To remove entire product from cart 
+ * @access Private
+ */
 router.delete("/remove/:productId/:variantId", authenticateUser, removeCartItem)
 
 

@@ -11,6 +11,9 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { handleGetProductById } = useProduct();
     const { handleAddItem , handleGetCart } = useCart()
+    const [cartMsg, setCartMsg] = useState({ text: '', type: '' })
+
+
 
     async function fetchProductDetails() {
         try {
@@ -241,59 +244,104 @@ const ProductDetail = () => {
                             </div>
 
                             {/* Actions */}
-                            <div className="flex flex-col gap-4 mt-auto">
-                                <button
-                                    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300"
-                                    style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6' }}
-                                    onMouseEnter={e => {
-                                        e.currentTarget.style.backgroundColor = '#C9A96E';
-                                        e.currentTarget.style.color = '#1b1c1a';
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.backgroundColor = '#1b1c1a';
-                                        e.currentTarget.style.color = '#fbf9f6';
-                                    }}
-                                    onClick={async () => {
-    try {
-        // Agar variant select nahi hai toh first variant use karo
-        const variantToUse = activeVariant || product?.variants?.[0]
-        
-        if (!variantToUse) {
-            alert("Please add at least one variant to this product")
-            return
-        }
-        
-        await handleAddItem({
-            productId: product._id,
-            variantId: variantToUse._id
-        })
-        
-        alert("Added to cart successfully!")
-        handleGetCart() // Cart refresh karo
-        
-    } catch (error) {
-        // Stock full ya koi error
-        if (error.response?.data?.message) {
-            alert(error.response.data.message)
-        } else {
-            alert("Failed to add to cart")
-        }
-    }
-}}
-                                >
-                                    Add to Cart
-                                </button>
+<div className="flex flex-col gap-4 mt-auto">
+    <button
+        className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300"
+        style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6' }}
+        onMouseEnter={e => {
+            e.currentTarget.style.backgroundColor = '#C9A96E';
+            e.currentTarget.style.color = '#1b1c1a';
+        }}
+        onMouseLeave={e => {
+            e.currentTarget.style.backgroundColor = '#1b1c1a';
+            e.currentTarget.style.color = '#fbf9f6';
+        }}
+        onClick={async () => {
+            try {
+                const variantToUse = activeVariant || product?.variants?.[0]
 
-                                <button
-                                    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border"
-                                    style={{ backgroundColor: 'transparent', borderColor: '#d0c5b5', color: '#1b1c1a' }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A96E'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0c5b5'; }}
-                                >
-                                    Buy Now
-                                </button>
-                            </div>
+                if (!variantToUse) {
+                    setCartMsg({ text: 'No variant available!', type: 'error' })
+                    setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                    return
+                }
 
+                await handleAddItem({
+                    productId: product._id,
+                    variantId: variantToUse._id
+                })
+
+                handleGetCart()
+                setCartMsg({ text: 'Added to your selection!', type: 'success' })
+                setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+
+            } catch (error) {
+                const msg = error.response?.data?.message || 'Failed to add to cart'
+                setCartMsg({ text: msg, type: 'error' })
+                setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+            }
+        }}
+    >
+        Add to Cart
+    </button>
+
+   <button
+    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border"
+    style={{ backgroundColor: 'transparent', borderColor: '#d0c5b5', color: '#1b1c1a' }}
+    onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A96E'; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0c5b5'; }}
+    onClick={async () => {
+        try {
+            const variantToUse = activeVariant || product?.variants?.[0]
+
+            if (!variantToUse) {
+                setCartMsg({ text: 'No variant available!', type: 'error' })
+                setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                return
+            }
+
+            await handleAddItem({
+                productId: product._id,
+                variantId: variantToUse._id
+            })
+
+            handleGetCart()
+            navigate('/cart')
+
+        } catch (error) {
+            const msg = error.response?.data?.message || 'Failed to add to cart'
+            setCartMsg({ text: msg, type: 'error' })
+            setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+        }
+    }}
+>
+    Buy Now
+</button>
+
+    {/* Cart Message */}
+    {cartMsg.text && (
+    <div
+        style={{
+            position: 'fixed',
+            top: '24px',
+            right: '24px',
+            zIndex: 9999,
+            backgroundColor: cartMsg.type === 'success' ? '#f0fdf4' : '#fef2f2',
+            border: `1px solid ${cartMsg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+            color: cartMsg.type === 'success' ? '#166534' : '#991b1b',
+            padding: '14px 20px',
+            fontSize: '12px',
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: '500',
+            letterSpacing: '0.05em',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            minWidth: '240px'
+        }}
+    >
+        {cartMsg.type === 'success' ? '✓' : '✕'} {cartMsg.text}
+    </div>
+)}
+</div>
                             {/* Policies */}
                             <div className="mt-14 space-y-4 text-[10px] uppercase tracking-[0.1em]" style={{ color: '#B5ADA3' }}>
                                 <div className="flex justify-between border-b pb-3" style={{ borderColor: '#e4e2df' }}>

@@ -19,7 +19,8 @@ const SellerProductDetails = () => {
     });
 
     const { productId } = useParams();
-    const { handleGetProductById, handleAddProductVariant } = useProduct();
+    const { handleGetProductById, handleAddProductVariant , handleDeleteProduct , handleDeleteProductVariant } = useProduct();
+
 
     async function fetchProductDetails() {
         setLoading(true);
@@ -96,6 +97,36 @@ const SellerProductDetails = () => {
         setNewVariant(prev => ({ ...prev, attributes: newAttrsObj }));
     };
 
+
+  async function handleProductDelete() {
+    if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
+        return
+    }
+
+    try {
+        await handleDeleteProduct(productId)
+        alert("Product deleted successfully!")
+        navigate('/seller/dashboard')
+    } catch (error) {
+        alert("Failed to delete product")
+    }
+}
+
+async function handleVariantDelete(variantId) {
+    if (!window.confirm("Are you sure you want to delete this variant?")) {
+        return
+    }
+
+    try {
+        await handleDeleteProductVariant(productId, variantId)
+        alert("Variant deleted successfully!")
+        fetchProductDetails() // Refresh product
+    } catch (error) {
+        alert("Failed to delete variant")
+    }
+}
+
+
     const handleRemoveAttribute = (index) => {
         const updatedInputs = attributeInputs.filter((_, i) => i !== index);
         setAttributeInputs(updatedInputs);
@@ -170,6 +201,12 @@ const SellerProductDetails = () => {
                 <h1 className="font-serif text-xl tracking-wide uppercase">
                     {product.title?.substring(0, 20)}{product.title?.length > 20 ? '...' : ''}
                 </h1>
+                 <button
+        onClick={handleProductDelete}
+        className="px-4 py-2 text-xs uppercase tracking-wider text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer"
+    >
+        Delete Product
+    </button>
             </header>
 
             <main className="max-w-6xl mx-auto px-4 md:px-8 mt-8">
@@ -358,41 +395,28 @@ const SellerProductDetails = () => {
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                             {localVariants.map((variant, idx) => (
-                                <div key={idx} className="bg-white flex flex-col pt-4 shadow-[0_20px_40px_rgba(27,28,26,0.02)]">
-                                    <div className="px-6 flex gap-4 h-24 mb-4">
-                                        <div className="w-16 h-20 bg-[#f5f3f0] shrink-0">
-                                            {variant.images && variant.images.length > 0 ? (
-                                                <img src={variant.images[0].url} alt="Variant" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-xs text-[#7f7668]">N/A</div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex flex-wrap gap-2 mb-2">
-                                                {Object.entries(variant.attributes || {}).map(([key, val]) => (
-                                                    <span key={key} className="bg-[#f5f3f0] px-2 py-1 text-xs uppercase tracking-wider text-[#4d463a]">
-                                                        <span className="text-[#a8a094]">{key}:</span> {val}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <div className="text-sm font-light">
-                                                {variant.price?.amount ? `${variant.price.amount} ${variant.price.currency}` : 'Base Price'}
-                                            </div>
-                                        </div>
-                                    </div>
+    <div key={idx} className="bg-[#ffffff] flex flex-col pt-4 shadow-[0_20px_40px_rgba(27,28,26,0.02)]">
+        {/* ...existing variant content... */}
 
-                                    {/* Stock Management */}
-                                    <div className="mt-auto border-t border-[#f5f3f0] bg-[#fbf9f6] flex items-center px-6 py-3 justify-between">
-                                        <label className="text-sm text-[#6e6258] uppercase tracking-wider">Current Stock</label>
-                                        <input
-                                            type="number"
-                                            value={variant.stock || 0}
-                                            onChange={(e) => handleStockChange(idx, e.target.value)}
-                                            className="w-20 bg-transparent border-b border-[#d0c5b5] py-1 text-right focus:outline-none focus:border-[#745a27] font-serif text-lg"
-                                        />
-                                    </div>
-                                </div>
-                            ))}
+        <div className="mt-auto border-t border-[#f5f3f0] bg-[#fbf9f6] flex items-center px-6 py-3 justify-between">
+            <label className="text-sm text-[#6e6258] uppercase tracking-wider">Current Stock</label>
+            <div className="flex items-center gap-4">
+                <input
+                    type="number"
+                    value={variant.stock || 0}
+                    onChange={(e) => handleStockChange(idx, e.target.value)}
+                    className="w-20 bg-transparent border-b border-[#d0c5b5] py-1 text-right focus:outline-none focus:border-[#745a27] font-serif text-lg"
+                />
+                <button
+                    onClick={() => handleVariantDelete(variant._id)}
+                    className="text-xs uppercase tracking-wider text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+))}
                         </div>
                     )}
                 </section>

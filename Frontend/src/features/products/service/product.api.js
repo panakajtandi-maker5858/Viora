@@ -50,3 +50,13 @@ const response = await productApiinstance.post(`/${productId}/variants` , formDa
 return response.data
 
 }
+
+export async function deleteProduct(productId) {
+    const response = await productApiInstance.delete(`/${productId}`)
+    return response.data
+}
+
+export async function deleteProductVariant(productId, variantId) {
+    const response = await productApiInstance.delete(`/${productId}/variants/${variantId}`)
+    return response.data
+}

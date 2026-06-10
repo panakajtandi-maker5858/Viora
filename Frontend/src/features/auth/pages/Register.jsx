@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import { useAuth } from "../hook/useAuth";
 import { useNavigate } from 'react-router';
 import ContinueWithGoogle from '../components/ContinueWithGoogle';
+import Toast from '../components/Toast'
 
-const Register = () => {
+
+
+const Register =  () => {
     const { handleRegister } = useAuth();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [toast, setToast] = useState(null)
+
+
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -21,8 +27,50 @@ const Register = () => {
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { fullName, contactNumber, email, password, isSeller } = formData
+
+    // Frontend validation
+    if (!fullName || !email || !contactNumber || !password) {
+        setToast({ message: 'Please fill in all fields', type: 'error' })
+        return
+    }
+
+    if (!email.includes('@')) {
+        setToast({ message: 'Please enter a valid email address', type: 'error' })
+        return
+    }
+
+    if (contactNumber.length !== 10 || isNaN(contactNumber)) {
+        setToast({ message: 'Contact number must be exactly 10 digits', type: 'error' })
+        return
+    }
+
+    if (password.length < 6) {
+        setToast({ message: 'Password must be at least 6 characters', type: 'error' })
+        return
+    }
+
+    try {
+        await handleRegister({
+            fullname: fullName,
+            email,
+            contact: contactNumber,
+            password,
+            isSeller
+        })
+        setToast({ message: 'Account created successfully!', type: 'success' })
+        setTimeout(() => navigate('/login'), 1500)
+    } catch (error) {
+        const message = error?.response?.data?.message
+            || error?.response?.data?.errors?.[0]?.msg
+            || 'Registration failed. Please try again.'
+        setToast({ message, type: 'error' })
+    }
+
+
         await handleRegister({
             email: formData.email,
             contact: formData.contactNumber,
@@ -31,7 +79,7 @@ const Register = () => {
             fullname: formData.fullName
         });
         navigate("/");
-    };
+    }; 
 
     const inputStyle = {
         color: '#1b1c1a',
@@ -44,6 +92,16 @@ const Register = () => {
 
     return (
         <>
+
+         {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(null)}
+            />
+        )}
+
+
             <link
                 href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
                 rel="stylesheet"
@@ -292,6 +350,6 @@ const Register = () => {
             </div>
         </>
     );
-};
+}
 
 export default Register;

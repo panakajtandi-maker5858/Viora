@@ -137,6 +137,57 @@ export async function addProductVariant(req, res) {
 }
 
 
+export async function deleteProduct(req, res) {
+    const { productId } = req.params
+
+    const product = await productModel.findOne({
+        _id: productId,
+        seller: req.user._id
+    })
+
+    if (!product) {
+        return res.status(404).json({
+            message: "Product not found or you are not authorized",
+            success: false
+        })
+    }
+
+    await productModel.findByIdAndDelete(productId)
+
+    return res.status(200).json({
+        message: "Product deleted successfully",
+        success: true
+    })
+}
+
+export async function deleteProductVariant(req, res) {
+    const { productId, variantId } = req.params
+
+    const product = await productModel.findOne({
+        _id: productId,
+        seller: req.user._id
+    })
+
+    if (!product) {
+        return res.status(404).json({
+            message: "Product not found or you are not authorized",
+            success: false
+        })
+    }
+
+    product.variants = product.variants.filter(
+        variant => variant._id.toString() !== variantId
+    )
+
+    await product.save()
+
+    return res.status(200).json({
+        message: "Variant deleted successfully",
+        success: true,
+        product
+    })
+}
+
 
 
 
