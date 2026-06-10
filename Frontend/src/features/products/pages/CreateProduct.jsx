@@ -14,6 +14,9 @@ const CreateProduct = () => {
         description: '',
         priceAmount: '',
         priceCurrency: 'INR',
+         stock: '',   
+        attrKey: 'Size',    
+        attrValue: '',
     });
     const [images, setImages] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
@@ -65,6 +68,9 @@ const CreateProduct = () => {
             data.append('description', formData.description);
             data.append('priceAmount', formData.priceAmount);
             data.append('priceCurrency', formData.priceCurrency);
+            data.append('stock', formData.stock);             
+            data.append('attrKey', formData.attrKey);          
+            data.append('attrValue', formData.attrValue); 
             images.forEach(img => data.append('images', img.file));
             await handleCreateProduct(data);
             navigate('/');
@@ -182,6 +188,51 @@ const CreateProduct = () => {
                                         </div>
                                     </div>
                                 </div>
+
+{/* Default Variant */}
+<div className="flex flex-col gap-3">
+    <label className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: '#7A6E63' }}>
+        Default Variant
+    </label>
+
+    {/* Stock */}
+    <div className="flex flex-col gap-1">
+        <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Stock *</span>
+        <input
+            type="number" name="stock"
+            value={formData.stock} onChange={handleChange} required
+            min="0" placeholder="e.g. 10"
+            className={inputClass} style={inputStyle}
+            onFocus={handleFocus} onBlur={handleBlur}
+        />
+    </div>
+
+    {/* Attribute Key + Value */}
+    <div className="flex gap-5">
+        <div className="flex flex-col gap-1 flex-1">
+            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Attribute Key *</span>
+            <input
+                type="text" name="attrKey"
+                value={formData.attrKey} onChange={handleChange} required
+                placeholder="e.g. Size"
+                className={inputClass} style={inputStyle}
+                onFocus={handleFocus} onBlur={handleBlur}
+            />
+        </div>
+        <div className="flex flex-col gap-1 flex-1">
+            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Attribute Value *</span>
+            <input
+                type="text" name="attrValue"
+                value={formData.attrValue} onChange={handleChange} required
+                placeholder="e.g. M"
+                className={inputClass} style={inputStyle}
+                onFocus={handleFocus} onBlur={handleBlur}
+            />
+        </div>
+    </div>
+</div>
+
+
                             </div>
 
                             <div className="flex flex-col gap-4">

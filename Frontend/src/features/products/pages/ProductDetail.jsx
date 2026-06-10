@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useProduct } from '../hooks/useProduct';
 import { useCart } from '../../cart/hook/useCart';
+import { useSelector } from 'react-redux';
+
 
 const ProductDetail = () => {
     const { productId } = useParams();
@@ -12,6 +14,7 @@ const ProductDetail = () => {
     const { handleGetProductById } = useProduct();
     const { handleAddItem , handleGetCart } = useCart()
     const [cartMsg, setCartMsg] = useState({ text: '', type: '' })
+    const user = useSelector(state => state.auth.user)
 
 
 
@@ -244,103 +247,110 @@ const ProductDetail = () => {
                             </div>
 
                             {/* Actions */}
+{/* Actions */}
 <div className="flex flex-col gap-4 mt-auto">
-    <button
-        className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300"
-        style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6' }}
-        onMouseEnter={e => {
-            e.currentTarget.style.backgroundColor = '#C9A96E';
-            e.currentTarget.style.color = '#1b1c1a';
-        }}
-        onMouseLeave={e => {
-            e.currentTarget.style.backgroundColor = '#1b1c1a';
-            e.currentTarget.style.color = '#fbf9f6';
-        }}
-        onClick={async () => {
-            try {
-                const variantToUse = activeVariant || product?.variants?.[0]
+    {user?.role === 'seller' ? (
+        <div
+            className="w-full py-4 text-center text-[11px] uppercase tracking-[0.25em] font-medium"
+            style={{ 
+                backgroundColor: '#f5f3f0', 
+                color: '#7A6E63',
+                border: '1px solid #d0c5b5'
+            }}
+        >
+            Sellers cannot purchase items
+        </div>
+    ) : (
+        <>
+            <button
+                className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300"
+                style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6' }}
+                onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = '#C9A96E';
+                    e.currentTarget.style.color = '#1b1c1a';
+                }}
+                onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor = '#1b1c1a';
+                    e.currentTarget.style.color = '#fbf9f6';
+                }}
+                onClick={async () => {
+                    try {
+                        const variantToUse = activeVariant || product?.variants?.[0]
+                        if (!variantToUse) {
+                            setCartMsg({ text: 'No variant available!', type: 'error' })
+                            setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                            return
+                        }
+                        await handleAddItem({
+                            productId: product._id,
+                            variantId: variantToUse._id
+                        })
+                        handleGetCart()
+                        setCartMsg({ text: 'Added to your selection!', type: 'success' })
+                        setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                    } catch (error) {
+                        const msg = error.response?.data?.message || 'Failed to add to cart'
+                        setCartMsg({ text: msg, type: 'error' })
+                        setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                    }
+                }}
+            >
+                Add to Cart
+            </button>
 
-                if (!variantToUse) {
-                    setCartMsg({ text: 'No variant available!', type: 'error' })
-                    setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
-                    return
-                }
+            <button
+                className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border"
+                style={{ backgroundColor: 'transparent', borderColor: '#d0c5b5', color: '#1b1c1a' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A96E'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0c5b5'; }}
+                onClick={async () => {
+                    try {
+                        const variantToUse = activeVariant || product?.variants?.[0]
+                        if (!variantToUse) {
+                            setCartMsg({ text: 'No variant available!', type: 'error' })
+                            setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                            return
+                        }
+                        await handleAddItem({
+                            productId: product._id,
+                            variantId: variantToUse._id
+                        })
+                        handleGetCart()
+                        navigate('/cart')
+                    } catch (error) {
+                        const msg = error.response?.data?.message || 'Failed to add to cart'
+                        setCartMsg({ text: msg, type: 'error' })
+                        setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
+                    }
+                }}
+            >
+                Buy Now
+            </button>
 
-                await handleAddItem({
-                    productId: product._id,
-                    variantId: variantToUse._id
-                })
-
-                handleGetCart()
-                setCartMsg({ text: 'Added to your selection!', type: 'success' })
-                setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
-
-            } catch (error) {
-                const msg = error.response?.data?.message || 'Failed to add to cart'
-                setCartMsg({ text: msg, type: 'error' })
-                setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
-            }
-        }}
-    >
-        Add to Cart
-    </button>
-
-   <button
-    className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 border"
-    style={{ backgroundColor: 'transparent', borderColor: '#d0c5b5', color: '#1b1c1a' }}
-    onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A96E'; }}
-    onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0c5b5'; }}
-    onClick={async () => {
-        try {
-            const variantToUse = activeVariant || product?.variants?.[0]
-
-            if (!variantToUse) {
-                setCartMsg({ text: 'No variant available!', type: 'error' })
-                setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
-                return
-            }
-
-            await handleAddItem({
-                productId: product._id,
-                variantId: variantToUse._id
-            })
-
-            handleGetCart()
-            navigate('/cart')
-
-        } catch (error) {
-            const msg = error.response?.data?.message || 'Failed to add to cart'
-            setCartMsg({ text: msg, type: 'error' })
-            setTimeout(() => setCartMsg({ text: '', type: '' }), 2500)
-        }
-    }}
->
-    Buy Now
-</button>
-
-    {/* Cart Message */}
-    {cartMsg.text && (
-    <div
-        style={{
-            position: 'fixed',
-            top: '24px',
-            right: '24px',
-            zIndex: 9999,
-            backgroundColor: cartMsg.type === 'success' ? '#f0fdf4' : '#fef2f2',
-            border: `1px solid ${cartMsg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
-            color: cartMsg.type === 'success' ? '#166534' : '#991b1b',
-            padding: '14px 20px',
-            fontSize: '12px',
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: '500',
-            letterSpacing: '0.05em',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            minWidth: '240px'
-        }}
-    >
-        {cartMsg.type === 'success' ? '✓' : '✕'} {cartMsg.text}
-    </div>
-)}
+            {cartMsg.text && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: '24px',
+                        right: '24px',
+                        zIndex: 9999,
+                        backgroundColor: cartMsg.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                        border: `1px solid ${cartMsg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+                        color: cartMsg.type === 'success' ? '#166534' : '#991b1b',
+                        padding: '14px 20px',
+                        fontSize: '12px',
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: '500',
+                        letterSpacing: '0.05em',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                        minWidth: '240px'
+                    }}
+                >
+                    {cartMsg.type === 'success' ? '✓' : '✕'} {cartMsg.text}
+                </div>
+            )}
+        </>
+    )}
 </div>
                             {/* Policies */}
                             <div className="mt-14 space-y-4 text-[10px] uppercase tracking-[0.1em]" style={{ color: '#B5ADA3' }}>
