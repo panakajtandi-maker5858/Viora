@@ -113,6 +113,8 @@ const SellerProductDetails = () => {
 }
 
 async function handleVariantDelete(variantId) {
+     console.log("Variant ID:", variantId) 
+     console.log("Product ID:", productId)
     if (!window.confirm("Are you sure you want to delete this variant?")) {
         return
     }

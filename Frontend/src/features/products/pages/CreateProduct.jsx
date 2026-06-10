@@ -17,6 +17,8 @@ const CreateProduct = () => {
          stock: '',   
         attrKey: 'Size',    
         attrValue: '',
+        colorKey: 'Color',    
+    colorValue: '',  
     });
     const [images, setImages] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
@@ -71,6 +73,7 @@ const CreateProduct = () => {
             data.append('stock', formData.stock);             
             data.append('attrKey', formData.attrKey);          
             data.append('attrValue', formData.attrValue); 
+            data.append('colorValue', formData.colorValue)
             images.forEach(img => data.append('images', img.file));
             await handleCreateProduct(data);
             navigate('/');
@@ -230,6 +233,20 @@ const CreateProduct = () => {
             />
         </div>
     </div>
+
+    {/* Color */}
+<div className="flex gap-5 mt-3">
+    <div className="flex flex-col gap-1 flex-1">
+        <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Color *</span>
+        <input
+            type="text" name="colorValue"
+            value={formData.colorValue} onChange={handleChange} required
+            placeholder="e.g. Black"
+            className={inputClass} style={inputStyle}
+            onFocus={handleFocus} onBlur={handleBlur}
+        />
+    </div>
+</div>
 </div>
 
 

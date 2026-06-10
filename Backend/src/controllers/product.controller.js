@@ -3,7 +3,7 @@ import { uploadFile } from "../services/storage.service.js";
 
 export async function createProduct(req, res){
 
-const { title , description , priceAmount , priceCurrency , stock, attrKey, attrValue } = req.body 
+const { title , description , priceAmount , priceCurrency , stock, attrKey, attrValue , colorValue} = req.body 
 const seller = req.user ;
 
 const images = await Promise.all(req.files.map(async(file)=>{
@@ -28,7 +28,8 @@ const product = await productModel.create({
                 images,                          // ← Same images as product
                 stock: Number(stock) || 0,
                 attributes: {
-                    [attrKey]: attrValue          // ← e.g. { Size: "M" }
+                    [attrKey]: attrValue ,          // ← e.g. { Size: "M" }
+                    Color: colorValue  
                 },
                 price: {
                     amount: Number(priceAmount),
