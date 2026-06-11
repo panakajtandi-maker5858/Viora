@@ -3,7 +3,7 @@ import axios, { formToJSON } from "axios"
 
 
 const productApiinstance = axios.create({
-    baseURL: "/api/products" ,
+    baseURL: "https://viora-backend-ew79.onrender.com/api/products" ,
     withCredentials: true ,
 })
 
