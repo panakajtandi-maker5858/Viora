@@ -18,11 +18,12 @@ async function sendTokenResponse(user, res, message) {
         expiresIn: "7d"
     })
 
-    res.cookie("token", token, cookieOptions)
+    
 
     res.status(200).json({
         message,
         success: true,
+        token ,
         user: {
             id: user._id,
             email: user.email,
