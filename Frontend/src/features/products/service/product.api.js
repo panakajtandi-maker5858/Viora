@@ -7,7 +7,7 @@ const productApiinstance = axios.create({
     withCredentials: true ,
 })
 
-productApiInstance.interceptors.request.use((config) => {
+productApiinstance.interceptors.request.use((config) => {
     const token = localStorage.getItem("token")
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
