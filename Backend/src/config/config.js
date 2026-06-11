@@ -1,5 +1,7 @@
 import dotenv from "dotenv"
-dotenv.config()
+import { resolve } from "path"
+
+dotenv.config({ path: resolve(process.cwd(), ".env") })
 
 if (!process.env.MONGO_URI) {
     throw new Error("MONGO_URI is not defined in environment variables")
@@ -21,6 +23,15 @@ if (!process.env.IMAGEKIT_PRIVATE_KEY) {
     throw new Error("IMAGEKIT_PRIVATE_KEY is not defined in environment variables")
 }
 
+if(!process.env.RAZORPAY_KEY_ID){
+    throw new Error("RAZORPAY_KEY_ID is not defined in environment variables")
+}
+
+if(!process.env.RAZORPAY_KEY_SECRET){
+     throw new Error("RAZORPAY_KEY_SECRET is not defined in environment variables")
+}
+
+
 export const config = {
     MONGO_URI: process.env.MONGO_URI,
     JWT_SECRET: process.env.JWT_SECRET,
@@ -28,6 +39,8 @@ export const config = {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     IMAGEKIT_PRIVATE_KEY : process.env.IMAGEKIT_PRIVATE_KEY ,
+     RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+    RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET
 }
 
 

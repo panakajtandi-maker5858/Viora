@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useCart } from '../hook/useCart'
 import { Link, useNavigate } from 'react-router'
+import { useRazorpay } from "react-razorpay";
+
+
+
 
 const tokens = {
     surface: '#fbf9f6',
@@ -21,7 +25,8 @@ const tokens = {
 
 const Cart = () => {
     const cart = useSelector(state => state.cart)
-    const { handleGetCart, handleIncrementCartItem , handleDecrementCartItem , handleRemoveCartItem} = useCart()
+    const { Razorpay } = useRazorpay();
+    const { handleGetCart, handleIncrementCartItem , handleDecrementCartItem , handleRemoveCartItem , handleCreateCartOrder, handleVerifyCartOrder} = useCart()
 
     const navigate = useNavigate()
     const user = useSelector(state => state.user)
@@ -49,6 +54,38 @@ const Cart = () => {
         if (product?.images?.length) return product.images[0].url
         return null
     }
+
+
+    async function handleCheckout() {
+    const order = await handleCreateCartOrder()
+    console.log(order)
+
+    const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Viora",
+        description: "Test Transaction",
+        order_id: order.id,
+        handler: async (response) => {
+            const isValid = await handleVerifyCartOrder(response)
+            if (isValid) {
+                navigate(`/order-success?order_id=${response?.razorpay_order_id}`)
+            }
+        },
+        prefill: {
+            name: user?.fullname,
+            email: user?.email,
+            contact: user?.contact,
+        },
+        theme: {
+            color: tokens.primary,
+        },
+    };
+
+    const razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
+}
 
     const formatCurrency = (amount, currency = 'INR') =>
         `${currency} ${Number(amount).toLocaleString('en-IN')}`
@@ -370,6 +407,7 @@ const Cart = () => {
 
                                 {/* Checkout Button */}
                                 <button
+                                onClick={handleCheckout}
                                     className="w-full py-4 mb-3 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300"
                                     style={{ backgroundColor: tokens.onSurface, color: tokens.surface }}
                                     onMouseEnter={e => {
