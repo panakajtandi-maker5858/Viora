@@ -8,11 +8,11 @@ const cartSlice = createSlice({
         items: [],
     },
     reducers: {
-        setCart: (state, action) => {
-            state.items = action.payload.items;
-            state.totalPrice = action.payload.totalPrice;
-            state.currency = action.payload.currency;
-        },
+       setCart: (state, action) => {
+    state.items = action.payload?.items || [];
+    state.totalPrice = action.payload?.totalPrice || 0;
+    state.currency = action.payload?.currency || 'INR';
+},
         addItem: (state, action) => {
             state.items.push(action.payload)
         },
