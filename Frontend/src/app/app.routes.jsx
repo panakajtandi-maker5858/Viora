@@ -9,7 +9,7 @@ import ProductDetail from "../features/products/pages/ProductDetail";
 import SellerProductDetails from "../features/products/pages/SellerProductDetails";
 import Cart from "../features/cart/pages/Cart";
 import OrderSuccess from "../features/cart/pages/OrderSuccess";
-import AppLayout from "./Applayout";
+import AppLayout from "./AppLayout";
 
 export const routes = createBrowserRouter([
     {
