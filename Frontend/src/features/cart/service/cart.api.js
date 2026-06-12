@@ -22,11 +22,14 @@ export const addItem = async ({ productId , variantId})=> {
 
 }
 
-export const getCart = async ()=>{
-
-const response = await cartApiInstance.get("/")
-return response.data
-
+export const getCart = async () => {
+    const token = localStorage.getItem("token")
+    const response = await cartApiInstance.get("/", {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return response.data
 }
 
 export const incrementCartItemApi = async ({ productId , variantId}) => {

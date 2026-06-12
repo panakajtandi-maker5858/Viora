@@ -33,7 +33,12 @@ export async function login({ email, password }) {
     return response.data
 }
 
-export async function getMe(){
-    const response = await authApiInstance.get("/me")
+export async function getMe() {
+    const token = localStorage.getItem("token")
+    const response = await authApiInstance.get("/me", {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
     return response.data
 }
