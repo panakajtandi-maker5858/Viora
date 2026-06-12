@@ -28,7 +28,7 @@ app.use(cors({
         "https://viora-mu.vercel.app",  
         /\.vercel\.app$/               
     ],
-    methods: ["GET" , "POST" , "PUT" , "DELETE"] ,
+    methods: ["GET" , "POST" , "PUT" , "DELETE" , "PATCH"] ,
     credentials: true 
 }))
 

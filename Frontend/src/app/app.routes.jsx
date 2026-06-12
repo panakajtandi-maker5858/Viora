@@ -10,7 +10,7 @@ import SellerProductDetails from "../features/products/pages/SellerProductDetail
 import Cart from "../features/cart/pages/Cart";
 import OrderSuccess from "../features/cart/pages/OrderSuccess";
 import AppLayout from "./AppLayout";
-import NotFound from "../features/Shared/Components/Notfound";
+import NotFound from "../features/Shared/Components/NotFound";
 
 
 
